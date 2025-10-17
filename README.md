@@ -23,3 +23,9 @@ ZPC - Jak vyrobit (téměř) cokoliv
   * Samostatné řízení 2 LED diod
   * Frekvence 1. diody řízení pomocí potenciometru
   * Frekvence 2. diody konstantní - perioda volitelná v programu
+
+Úloha č.6 - Sériová komunikace UART (Arduino - PC)
+ * "Hello world!"
+ * Zobrazení hodnoty potenciometru (v procentech)
+ * Zobzraení periody blikání LED diody
+ * Zápis hodnot každou sekundu
