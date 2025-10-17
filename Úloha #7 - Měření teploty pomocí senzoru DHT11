@@ -1,0 +1,29 @@
+#include <DHT.h>
+
+#define DHT_PIN 5
+#define DHT_TYPE DHT11
+
+float DHT_temperature;
+float DHT_humidity;
+
+unsigned long timestamp;
+int period_sens;
+
+DHT myDHT(DHT_PIN, DHT_TYPE);
+
+void setup() {
+  Serial.begin(9600);
+  myDHT.begin();
+}
+
+void loop() {
+  DHT_temperature = myDHT.readTemperature();
+  DHT_humidity = myDHT.readHumidity();
+
+  timestamp = millis();
+
+  if((timestamp % period_sens) == 0) 
+  {
+    Serial.println("[DHT] Teplota: " + String(DHT_temperature) + " °C | Vlhkost: " + String(DHT_humidity) + "%");
+  }
+}
