@@ -1,0 +1,26 @@
+int LED_dioda_PIN = 3;
+int Pot_PIN = A5;
+
+int Pot_hodnota;
+int Perioda;
+
+unsigned long t_millis;
+int Perioda_const = 1000;
+
+
+void setup()
+{
+  pinMode(LED_dioda_PIN, OUTPUT);
+  pinMode(Pot_PIN, INPUT);
+}
+
+void loop()
+{
+  Pot_hodnota = analogRead(Pot_PIN);
+  Perioda = map(Pot_hodnota, 0, 1023, 500, 5000);
+  
+  digitalWrite(LED_dioda_PIN, HIGH);
+  delay(Perioda/2);
+  digitalWrite(LED_dioda_PIN, LOW);
+  delay(Perioda/2);
+}
