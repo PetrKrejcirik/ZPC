@@ -1,0 +1,61 @@
+const int period_green_min = 500;
+const int period_green_max = 5000;
+
+const int period_write = 1000;
+
+int LED_green = 3; //PWM
+int LED_red = 6; //PWM
+
+int POT_green = A5; //Analog input
+
+int period_green;
+
+int signal_green;
+int period_red = 3000;
+
+unsigned long timestamp;
+
+
+void setup()
+{
+  pinMode(LED_green, OUTPUT);
+  pinMode(LED_red, OUTPUT);
+  
+  pinMode(POT_green, INPUT);
+  
+  Serial.begin(9600);
+  Serial.println("Hello world!");
+}
+
+void loop()
+{
+  timestamp = millis();
+  signal_green = analogRead(POT_green);
+  period_green = map(signal_green, 0, 1023, period_green_min, period_green_max);
+  //blikání zelené
+  if((timestamp % period_green) < (period_green / 2)) 
+  {
+    digitalWrite(LED_green, HIGH);
+  }
+  else
+  {
+    digitalWrite(LED_green, LOW);
+  }
+     
+  //blikání červené
+  if((timestamp % period_red) < (period_red / 2)) 
+  {
+    digitalWrite(LED_red, HIGH);
+  }
+  else 
+  {
+    digitalWrite(LED_red, LOW);
+  }
+  
+  if((timestamp % period_write) == 0) {
+    Serial.print("Cas od zapnuti: " + String(timestamp) + "ms");
+    Serial.print("| Potenciometr: " + String(float(signal_green)*100/1023.0) + "%");
+    Serial.println("| Perioda: " + String(period_green) + "ms");
+  }     
+  
+}
