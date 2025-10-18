@@ -28,4 +28,9 @@ ZPC - Jak vyrobit (téměř) cokoliv
  * "Hello world!"
  * Zobrazení hodnoty potenciometru (v procentech)
  * Zobzraení periody blikání LED diody
- * Zápis hodnot každou sekundu
+ * Zápis hodnot na serial port, každou sekundu
+
+Úloha č.7 - Měření teploty pomocí senzoru DHT11
+ * Instalace knihovny
+ * Inicializace senzoru
+ * Zápis hodnot na serial port, každou sekundu
