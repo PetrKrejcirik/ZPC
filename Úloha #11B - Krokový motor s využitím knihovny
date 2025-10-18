@@ -1,0 +1,66 @@
+#include <AccelStepper.h>
+
+#define MODE_TRACK false
+#define MODE_RPM true
+
+// PINY PRO TB6600 DRIVER
+const int Stepper_STEP = 4;
+const int Stepper_DIR  = 5;
+const int Stepper_ENAB = 6;
+
+// OSTATNÍ PINY
+const int Stepper_POT = A0;
+const int Stepper_MODE_PIN = 3;
+
+// NASTAVENÍ
+const int Stepper_MAXRPM = 200;
+const int Stepper_TrackRPM = 100;
+const long StepperPOS_MAX = 360;
+const int DriverMicrostep = 800;
+
+// PROMĚNNÉ
+bool StepperMode; // RPM = true, TRACK = false
+int StepperRPM;
+long StepperPOSTarget;
+long StepperPulseTarget;
+
+int PotValue;
+
+// PŘIPOJENÍ DRIVERU (typ DRIVER = STEP + DIR)
+AccelStepper stepper(AccelStepper::DRIVER, Stepper_STEP, Stepper_DIR);
+
+void setup() {
+  pinMode(Stepper_ENAB, OUTPUT);
+  pinMode(Stepper_MODE_PIN, INPUT);
+  pinMode(Stepper_POT, INPUT);
+
+  digitalWrite(Stepper_ENAB, LOW); // Aktivace driveru (ENA-LOW = zapnuto)
+
+  stepper.setMaxSpeed(DriverMicrostep * Stepper_MAXRPM / 60.0); // max rychlost v krocích/s
+  stepper.setAcceleration(DriverMicrostep * 100); // akcelerace – můžeš doladit
+}
+
+void loop() {
+  PotValue = analogRead(Stepper_POT);
+  StepperMode = digitalRead(Stepper_MODE_PIN);
+
+  if (StepperMode == MODE_RPM) {
+    // === MÓD RPM ===
+    StepperRPM = map(PotValue, 0, 1023, 0, Stepper_MAXRPM);
+    float stepsPerSec = (float(StepperRPM) * DriverMicrostep) / 60.0;
+    stepper.setSpeed(stepsPerSec);
+    stepper.runSpeed(); // běží konstantní rychlostí
+
+  } else {
+    // === MÓD TRACK ===
+    StepperRPM = Stepper_TrackRPM;
+    StepperPOSTarget = map(PotValue, 0, 1023, 0, StepperPOS_MAX);
+
+    // Přepočet úhlu na kroky (1 otáčka = 360°)
+    StepperPulseTarget = long((float(StepperPOSTarget) / 360.0) * DriverMicrostep);
+
+    stepper.setMaxSpeed((float(StepperRPM) * DriverMicrostep) / 60.0);
+    stepper.moveTo(StepperPulseTarget);
+    stepper.run(); // provádí pohyb směrem k cíli
+  }
+}
