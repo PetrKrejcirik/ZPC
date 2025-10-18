@@ -1,0 +1,68 @@
+#include <Servo.h>
+
+#define MODE_TRACK false
+#define MODE_RPM true
+
+const int Servo_PIN = 9;
+const int Servo_MODE_PIN = 3;
+const int Servo_POT = A0;
+
+const int Servo_STOP = 1500;   // neutrální
+const int Servo_MIN  = 1300;   // max vlevo
+const int Servo_MAX  = 1700;   // max vpravo
+
+bool ServoMode;
+int PotValue;
+
+Servo myservo;
+
+unsigned long timestamp;
+unsigned long LastTS;
+const unsigned long interval = 20; // 50 Hz
+
+long StepperPOSActual = 0;   // naše „aktuální pozice“
+long StepperPOSTarget = 0;   // cílová pozice
+long StepperPulseTarget = 0; // počet kroků potřebných k dosažení cíle
+
+void setup() {
+  pinMode(Servo_MODE_PIN, INPUT);
+  pinMode(Servo_POT, INPUT);
+
+  myservo.attach(Servo_PIN);
+  myservo.writeMicroseconds(Servo_STOP);
+
+  LastTS = 0;
+}
+
+void loop() {
+  timestamp = millis();
+  PotValue = analogRead(Servo_POT);
+  ServoMode = digitalRead(Servo_MODE_PIN);
+
+  if (timestamp - LastTS >= interval) {
+    LastTS = timestamp;
+
+    if (ServoMode == MODE_RPM) {
+      // RPM mód – potenciometr = rychlost/směr
+      int pulse = map(PotValue, 0, 1023, Servo_MIN, Servo_MAX);
+      myservo.writeMicroseconds(pulse);
+
+    } else {
+      // TRACK mód – poziční
+      StepperPOSTarget = map(PotValue, 0, 1023, 0, 360); // cílový úhel
+      StepperPulseTarget = 5; // rychlost servo: malé kroky k cíli
+
+      if (StepperPOSActual < StepperPOSTarget) {
+        myservo.writeMicroseconds(Servo_MAX); // otáčí dopředu
+        StepperPOSActual += StepperPulseTarget;
+      } 
+      else if (StepperPOSActual > StepperPOSTarget) {
+        myservo.writeMicroseconds(Servo_MIN); // otáčí dozadu
+        StepperPOSActual -= StepperPulseTarget;
+      } 
+      else {
+        myservo.writeMicroseconds(Servo_STOP); // zastavit
+      }
+    }
+  }
+}
