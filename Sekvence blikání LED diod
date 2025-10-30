@@ -1,0 +1,48 @@
+//piny
+int LED_R = 6;
+int LED_O = 5;
+int LED_G = 3;
+int Pot_1 = A5;
+
+//Potenciometr
+int Pot_Val;
+
+
+//SYSTEM
+unsigned long t_millis;  
+//Blikání LED diody
+int Perioda_Pot;
+int Perioda_MIN = 500;
+int Perioda_MAX = 5000;
+
+void setup()
+{
+  pinMode(LED_R, OUTPUT);
+  pinMode(LED_O, OUTPUT);
+  pinMode(LED_G, OUTPUT);
+  pinMode(Pot_1, INPUT);
+  
+}
+
+void loop()
+{
+  t_millis = millis();
+  Pot_Val = analogRead(Pot_1);
+  Perioda_Pot = map(Pot_Val, 0, 1023, Perioda_MIN, Perioda_MAX);
+  
+  if(t_millis % Perioda_Pot < Perioda_Pot / 3) {
+    digitalWrite(LED_R, HIGH);
+    digitalWrite(LED_O, LOW);
+    digitalWrite(LED_G, LOW);
+  }
+  else if((t_millis % Perioda_Pot >= Perioda_Pot / 3) && (t_millis % Perioda_Pot < 2*Perioda_Pot/3))  {
+    digitalWrite(LED_R, LOW);
+    digitalWrite(LED_O, HIGH);
+    digitalWrite(LED_G, LOW);
+  }
+  else {
+    digitalWrite(LED_R, LOW);
+    digitalWrite(LED_O, LOW);
+    digitalWrite(LED_G, HIGH);      
+  }
+}
